@@ -10,26 +10,34 @@
             <textarea id="geo" rows="6" cols="50"></textarea><br>
             
             <input type="button" onclick="calc()" value="Calc">
-            <input type="reset"><br>
+            <input type="reset">
+            <input type="button" onclick="testall()" value="Test">
+            <br>
 
             <label for="out">Output:</label><br>
             <textarea id="out" name="out" rows="6" cols="50"></textarea><br>
         </form>
 
         <script>
-            let symbols = ['','H','He','Li','Be','B','C','N','O','F','Ne']
+            let geofield = document.getElementById('geo');
+            let outfield = document.getElementById('out');
+            let symbols = ['','H','He','Li','Be',   'B','C','N','O','F','Ne',
+                            "Na","Mg",              "Al","Si","P","S","Cl","Ar",
+                            "K","Ca","Sc","Ti","V","Cr","Mn","Fe","Co","Ni","Cu","Zn","Ga","Ge","As","Se","Br","Kr"];
             let atnos = {}
             for ([i,s] of symbols.entries()){
                 atnos[s] = i
             }
-            function text_part(word){
-                // matches the character part of an atom label
+            function get_atno(symbol){
+                return atnos[text_part(symbol)]
+            }
+            function text_part(word){ // matches the character part of an atom label
                 return word.match(/[A-Za-z]+/)
             }
             function parse_xyz(text){
                 let geo = []
                 for (line of text.split("\n")){
-                    words = line.split(/\s/)
+                    words = line.trim().split(/\s/)
                     if (words.length < 4) continue;
                     sym = words[0] 
                     x = +words[1]
@@ -40,14 +48,79 @@
                 return geo
             }
             function calc(){
-                let geofield = document.getElementById('geo')
-                let outfield = document.getElementById('out')
 
                 let text = geofield.value;
                 let geo = parse_xyz(text);
-                outfield.value = geo;
-                alert(atnos['He'])
+                outfield.value = e_repulsion(geo)
             }
+            function distance(x1,y1,z1,x2,y2,z2){
+                return Math.sqrt(Math.pow(x1-x2,2) + Math.pow(y1-y2,2) + Math.pow(z1-z2,2));
+            }
+            function to_kcal_mol(energy_h) {return 627.51*energy_h}
+            function e_repulsion(geo){
+                let erep = 0;
+                let i,j;
+                for (i=0; i<geo.length; i++){
+                    [symi,xi,yi,zi] = geo[i];
+                    for (j=0; j<i; j++){
+                        [symj,xj,yj,zj] = geo[j];
+                        erep += get_atno(symi)*get_atno(symj)/distance(xi,yi,zi,xj,yj,zj)
+                    }
+                }
+                return erep
+            }
+            // function arrayeq(array1,array2){
+            //     if (array1.length !== array2.length) return false;
+            //     for ([i,el] of array1.entries()){
+            //         if (array2[i] != el) return false;
+            //     }
+            //     return true;
+            // }
+            function testall(){
+                success = true;
+                geofield.value = "O1   0.0  0.0 0.0\n  H1 0.9 0.0 0.0\n H2 0.0 0.9 0.0"
+                if (!testeq(atnos["He"], 2,"Atomic number He")) success = false;
+                if (!testeq(atnos["Li"], 3,"Atomic number Li")) success = false;
+                if (!testarrayeq(parse_xyz("O1 0.0 0.0 0.0")[0],["O1",0,0,0],"parse_geo")) success = false;
+                if (!testeq(text_part("O1"),"O","text_part")) success = false;
+                if (!testeq(get_atno("O1"),8,"get_atno")) success = false;
+                if (!testeq(get_atno("Kr"),36,"get_atno Kr")) success = false;
+                if (!testapprox(distance(0,0,0,1,1,0),Math.SQRT2,"distance")) success = false;
+                if (!testapprox(to_kcal_mol(1),627.51,"to_kcal_mol")) success = false;
+                if (success) {
+                    alert("All tests passed")
+                } else {
+                    alert("At least one test failed")
+                }
+            }
+            function testeq(tester,value,message){
+                if (tester != value) {
+                    alert(`testeq ${message} failure ${tester} != ${value}`);
+                    return false;
+                }
+                return true;
+            }
+            function testapprox(tester,value,message,delta=0.00001){
+                if (Math.abs(tester-value)>delta) {
+                    alert(`testapprox ${message} failure ${tester} !~= ${value}`);
+                    return false;
+                }
+                return true;
+            }
+            function testarrayeq(tester,value,message){
+                if (tester.length != value.length) {
+                    alert(`testarrayeq ${message} length mismatch ${tester.length} != ${value.length}`);
+                    return false;
+                }
+                for (let [i,el] of tester.entries()){
+                    if (value[i] != el) {
+                        alert(`testarrayeq ${message} failure ${el} != ${value[i]}`);
+                        return false;
+                    }
+                }
+                return true
+            }
+            
 
         </script>
 
