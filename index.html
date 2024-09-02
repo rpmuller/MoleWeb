@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Molecular Website</title>
+    </head>
+    <body>
+        <h1>Molecular Playground</h1>
+        <form id="theform">
+            <label for="geo">Geometry:</label><br>
+            <textarea id="geo" rows="6" cols="50"></textarea><br>
+            
+            <input type="button" onclick="calc()" value="Calc">
+            <input type="reset"><br>
+
+            <label for="out">Output:</label><br>
+            <textarea id="out" name="out" rows="6" cols="50"></textarea><br>
+        </form>
+
+        <script>
+            let symbols = ['','H','He','Li','Be','B','C','N','O','F','Ne']
+            function parse_xyz(text){
+                let geo = []
+                for (line of text.split("\n")){
+                    words = line.split(/\s/)
+                    if (words.length < 4) continue;
+                    sym = words[0] // change this to pull out only symbol from "O1" "H2" etc
+                    x = +words[1]
+                    y = +words[2]
+                    z = +words[3]                    
+                    geo.push([sym,x,y,z])
+                }
+                return geo
+            }
+            function calc(){
+                let text = document.getElementById("geo").value;
+                let geo = parse_xyz(text);
+                document.getElementById("out").value = geo;
+            }
+
+            <!-- 3. Compute something with those coordinates, e.g. the repulsion energy -->
+            <!-- 4. Draw the coordinate to a 3D.js frame -->
+        </script>
+
+
+    </body>
+</html>
