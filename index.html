@@ -18,12 +18,20 @@
 
         <script>
             let symbols = ['','H','He','Li','Be','B','C','N','O','F','Ne']
+            let atnos = {}
+            for ([i,s] of symbols.entries()){
+                atnos[s] = i
+            }
+            function text_part(word){
+                // matches the character part of an atom label
+                return word.match(/[A-Za-z]+/)
+            }
             function parse_xyz(text){
                 let geo = []
                 for (line of text.split("\n")){
                     words = line.split(/\s/)
                     if (words.length < 4) continue;
-                    sym = words[0] // change this to pull out only symbol from "O1" "H2" etc
+                    sym = words[0] 
                     x = +words[1]
                     y = +words[2]
                     z = +words[3]                    
@@ -32,9 +40,13 @@
                 return geo
             }
             function calc(){
-                let text = document.getElementById("geo").value;
+                let geofield = document.getElementById('geo')
+                let outfield = document.getElementById('out')
+
+                let text = geofield.value;
                 let geo = parse_xyz(text);
-                document.getElementById("out").value = geo;
+                outfield.value = geo;
+                alert(atnos['He'])
             }
 
         </script>
