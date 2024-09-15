@@ -4,16 +4,16 @@ function approx(a,b,delta=1e-4) {
 }
 
 // function arrayeq(a,b) {}
-const VERBOSE = false; // Only show tests that fail.
+const VERBOSE_TESTS = false; // Only show tests that fail.
 function test(tag,val1,val2,delta){
   let result = false
   if (delta === undefined){
     result = (val1 === val2)
-    if (VERBOSE || (!result))
+    if (VERBOSE_TESTS || (!result))
       console.log(`testing ${tag}: ${val1}=${val2} ${result}`);
   } else {
     result = approx(val1,val2,delta);
-    if (VERBOSE || (!result))
+    if (VERBOSE_TESTS || (!result))
       console.log(`testing ${tag}: ${val1} \u2248 ${val2} ${result}`)
   }
 }
