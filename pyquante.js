@@ -4,15 +4,17 @@ function approx(a,b,delta=1e-4) {
 }
 
 // function arrayeq(a,b) {}
-  
+const VERBOSE = false; // Only show tests that fail.
 function test(tag,val1,val2,delta){
   let result = false
   if (delta === undefined){
-    result = (val1 === val2) ? "passed" : "failed"
-    console.log(`testing ${tag}: ${val1}=${val2} ${result}`)
+    result = (val1 === val2)
+    if (VERBOSE || (!result))
+      console.log(`testing ${tag}: ${val1}=${val2} ${result}`);
   } else {
-    result = approx(val1,val2,delta) ? "passed" : "failed"
-    console.log(`testing ${tag}: ${val1} \u2248 ${val2} ${result}`)
+    result = approx(val1,val2,delta);
+    if (VERBOSE || (!result))
+      console.log(`testing ${tag}: ${val1} \u2248 ${val2} ${result}`)
   }
 }
 
@@ -130,11 +132,11 @@ function overlap(aexp,aI,aJ,aK,a0, bexp,bI,bJ,bK,b0){
   let gamma = aexp+bexp;
   let P = gaussian_product_center(aexp,a0,bexp,b0);
  
-  let pre = Math.pow(Math.pi/gamma,1.5)*Math.exp(-aexp*bexp*r2/gamma);
+  let pre = Math.pow(Math.PI/gamma,1.5)*Math.exp(-aexp*bexp*r2/gamma);
   
-  let sx = overlap1d(a.I,b.I,P.x-a0.x,P.x-b0.x,gamma),
-      sy = overlap1d(a.J,b.J,P.y-a0.y,P.y-b0.y,gamma),
-      sz = overlap1d(a.K,b.K,P.z-a0.z,P.z-b0.z,gamma);
+  let sx = overlap1d(aI,bI,P.x-a0.x,P.x-b0.x,gamma),
+      sy = overlap1d(aJ,bJ,P.y-a0.y,P.y-b0.y,gamma),
+      sz = overlap1d(aK,bK,P.z-a0.z,P.z-b0.z,gamma);
   
   return pre*sx*sy*sz
 }
@@ -152,7 +154,7 @@ function overlap1d(aL,bL,da,db,gamma){
 function binomial_prefactor(s,ia,ib,xpa,xpb){
   let sum=0;
   for (let t=0; t< s+1; t++){
-    if ((t >= s-ai) && (t <= ib))
+    if ((t >= s-ia) && (t <= ib))
       sum += binomial(ia,s-t)*binomial(ib,t)
              *Math.pow(xpa,ia-s+t)*Math.pow(xpb,ib-t);
   }
@@ -184,6 +186,7 @@ function tests(){
   let b = new Point(1,0,0);
   test("a.distance(b)",a.distance(b),1);
 
+  let O = a;
   let s = new PGBF(1.0,O)
   let px = new PGBF(1.0,O,1)
 
@@ -204,3 +207,5 @@ function tests(){
 
 
 }
+
+tests()
