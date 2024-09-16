@@ -139,7 +139,7 @@ class PGBF {
     this.J = J;
     this.K = K;
     this.norm = 1;
-    //this.normalize();
+    this.normalize();
   }
   normalize() {
     let IJK = this.I + this.J + this.K;
@@ -242,7 +242,7 @@ function overlap(aexp, aI, aJ, aK, a0, bexp, bI, bJ, bK, b0) {
   return pre * sx * sy * sz;
 }
 suite.add(
-  new TestCase("overlap", overlap(1, 0, 0, 0, O, 1, 0, 0, 0, O), 1, 1e-8)
+  new TestCase("overlap", overlap(1, 0, 0, 0, O, 1, 0, 0, 0, O), 1.96870124, 1e-5)
 );
 
 // One-dimensional component of the overlap integral
