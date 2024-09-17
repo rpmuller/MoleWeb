@@ -110,31 +110,24 @@ suite.add(new TestCase("fact(0)", fact(0), 1));
 suite.add(new TestCase("fact2(0)", fact2(0), 1));
 suite.add(new TestCase("fact2(3)", fact2(3), 3));
 
-class Point {
-  constructor(x, y, z) {
-    this.x = x;
-    this.y = y;
-    this.z = z;
-  }
-  distance2(other) {
-    let dx = this.x - other.x;
-    let dy = this.y - other.y;
-    let dz = this.z - other.z;
-    return dx * dx + dy * dy + dz * dz;
-  }
-  distance(other) {
-    return Math.sqrt(this.distance2(other));
-  }
+// replacing the old Point with a 3-tuple:
+//class Point { //etc };
+function distance2(xyz1, xyz2) {
+  let dx = xyz1[0] - xyz2[0];
+  let dy = xyz1[1] - xyz2[1];
+  let dz = xyz1[2] - xyz2[2];
+  return dx * dx + dy * dy + dz * dz;
+}
+function distance(xyz1, xyz2) {
+  return Math.sqrt(distance2(xyz1, xyz2));
 }
 
-let a = new Point(0, 0, 0);
-let b = new Point(1, 0, 0);
-suite.add(new TestCase("a.distance(b)", a.distance(b), 1));
+suite.add(new TestCase("distance", distance([0, 0, 0], [1, 0, 0]), 1));
 
 class PGBF {
   constructor(exponent, origin, I = 0, J = 0, K = 0) {
     this.exponent = exponent;
-    this.origin = origin; // Point
+    this.origin = origin; // xyz tuple
     this.I = I;
     this.J = J;
     this.K = K;
@@ -152,9 +145,9 @@ class PGBF {
     );
   }
   amplitude(pt) {
-    let dx = pt.x - this.origin.x,
-      dy = pt.y - this.origin.y,
-      dz = pt.z - this.origin.z;
+    let dx = pt[0] - this.origin[0],
+      dy = pt[1] - this.origin[1],
+      dz = pt[2] - this.origin[2];
     let r2 = dx * dx + dy * dy + dz * dz;
     return (
       this.norm *
@@ -166,7 +159,7 @@ class PGBF {
   }
 }
 
-let O = a;
+let O = [0, 0, 0];
 let s = new PGBF(1.0, O);
 let px = new PGBF(1.0, O, 1);
 
@@ -228,21 +221,26 @@ suite.add(new TestCase("S(s,s)", S(s, s), 1, 1e-8));
 
 // Full form of the overlap integral between primative functions:
 function overlap(aexp, aI, aJ, aK, a0, bexp, bI, bJ, bK, b0) {
-  let r2 = a0.distance2(b0);
+  let r2 = distance2(a0, b0);
   let gamma = aexp + bexp;
   let P = gaussian_product_center(aexp, a0, bexp, b0);
 
   let pre =
     Math.pow(Math.PI / gamma, 1.5) * Math.exp((-aexp * bexp * r2) / gamma);
 
-  let sx = overlap1d(aI, bI, P.x - a0.x, P.x - b0.x, gamma),
-    sy = overlap1d(aJ, bJ, P.y - a0.y, P.y - b0.y, gamma),
-    sz = overlap1d(aK, bK, P.z - a0.z, P.z - b0.z, gamma);
+  let sx = overlap1d(aI, bI, P[0] - a0[0], P[0] - b0[0], gamma),
+    sy = overlap1d(aJ, bJ, P[1] - a0[1], P[1] - b0[1], gamma),
+    sz = overlap1d(aK, bK, P[2] - a0[2], P[2] - b0[2], gamma);
 
   return pre * sx * sy * sz;
 }
 suite.add(
-  new TestCase("overlap", overlap(1, 0, 0, 0, O, 1, 0, 0, 0, O), 1.96870124, 1e-5)
+  new TestCase(
+    "overlap",
+    overlap(1, 0, 0, 0, O, 1, 0, 0, 0, O),
+    1.96870124,
+    1e-5
+  )
 );
 
 // One-dimensional component of the overlap integral
@@ -278,16 +276,11 @@ suite.add(
 function gaussian_product_center(aexp, a0, bexp, b0) {
   let a = aexp / (aexp + bexp),
     b = bexp / (aexp + bexp);
-  return new Point(
-    a * a0.x + b * b0.x,
-    a * a0.y + b * b0.y,
-    a * a0.z,
-    b * b0.z
-  );
+  return [a * a0[0] + b * b0[0], a * a0[1] + b * b0[1], a * a0[2] + b * b0[2]];
 }
 //should probably make a harder to pass testcase
 let gc = gaussian_product_center(1, O, 1, O);
-suite.add(new TestCase("gaussian product center", gc.x + gc.y + gc.z, 0));
+suite.add(new TestCase("gaussian product center", gc[0] + gc[1] + gc[2], 0));
 
 // binomial coefficient: should this be called `choose`?
 function binomial(n, k) {
