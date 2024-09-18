@@ -1,88 +1,13 @@
-import {TestCase, TestSuite} from "./test.js"
+import { TestCase, TestSuite } from "./test.js";
 
-// // utilities
-// function approx(a, b, delta = 1e-4) {
-//   return Math.abs(a - b) < delta;
-// }
-
-// function arrayeq(a,b) {}
-
-// class TestCase {
-//   constructor(tag, val1, val2, delta) {
-//     this.tag = tag;
-//     this.val1 = val1;
-//     this.val2 = val2;
-//     this.delta = delta;
-//   }
-//   run(verbose = false) {
-//     let result = false,
-//       op = "=",
-//       summary = "FAIL";
-//     if (this.delta === undefined) {
-//       result = this.val1 === this.val2;
-//       op = "=";
-//     } else {
-//       result = approx(this.val1, this.val2, this.delta);
-//       op = "\u2248";
-//     }
-//     summary = result ? "PASS" : "FAIL";
-//     if (verbose || !result)
-//       console.log(
-//         `    ${summary} ${this.tag}: ${this.val1}${op}${this.val2}: ${result}`
-//       );
-//     return Number(result);
-//   }
-// }
-
-// class TestSuite {
-//   constructor(name, cases, verbose = false) {
-//     this.name = name;
-//     this.cases = cases;
-//     this.verbose = verbose;
-//   }
-//   add(tcase) {
-//     this.cases.push(tcase);
-//   }
-//   run(verbose = false) {
-//     let ncases = this.cases.length,
-//       passed = 0;
-//     let start = Date.now();
-//     console.log(`\nTest suite ${this.name}`);
-//     for (let tcase of this.cases) {
-//       passed += tcase.run(verbose);
-//     }
-//     let elapsed = Date.now() - start;
-//     console.log(
-//       `${ncases - passed} test cases failed out of ${ncases} in ${
-//         elapsed / 1000
-//       } sec\n`
-//     );
-//   }
-// }
 let suite = new TestSuite("PyQuante.jl tests", [
   new TestCase("1+1", 1 + 1, 2),
   //new TestCase("1+1",1+1,3), // Test false
   new TestCase("3.14", Math.PI, 3.14, 1),
 ]);
 
-// //suite.run(true)
-
-// // One-off test case
-// const VERBOSE_TESTS = false; // control result printing with global const
-// function test(tag, val1, val2, delta) {
-//   let result = false;
-//   if (delta === undefined) {
-//     result = val1 === val2;
-//     if (VERBOSE_TESTS || !result)
-//       console.log(`testing ${tag}: ${val1}=${val2} ${result}`);
-//   } else {
-//     result = approx(val1, val2, delta);
-//     if (VERBOSE_TESTS || !result)
-//       console.log(`testing ${tag}: ${val1} \u2248 ${val2} ${result}`);
-//   }
-// }
-
 function range(start, end = 0, step = 1) {
+  // TODO make into a generator or iterator
   let l = [];
   if (end === 0) {
     end = start;
@@ -113,7 +38,6 @@ suite.add(new TestCase("fact2(0)", fact2(0), 1));
 suite.add(new TestCase("fact2(3)", fact2(3), 3));
 
 // replacing the old Point with a 3-tuple:
-//class Point { //etc };
 function distance2(xyz1, xyz2) {
   let dx = xyz1[0] - xyz2[0];
   let dy = xyz1[1] - xyz2[1];
@@ -181,15 +105,12 @@ class CGBF {
       this.pgbfs.push(new PGBF(exps[i], origin, I, J, K));
     }
     this.norm = 1;
-    // TODO: write the overlap function S
-    //this.normalize()
+    this.normalize();
   }
   normalize() {
     // Experimenting with keeping a separate norm, rather than adjusting all the coefficients
     // like I do in pyquante.
-
-    // TODO: write the overlap function S
-    this.norm = 1 / Math.sqrt(S(this, this));
+    this.norm = 1 / Math.sqrt(Sc(this, this));
   }
   amplitude(pt) {
     let sum = 0;
@@ -200,6 +121,7 @@ class CGBF {
 
 let sc = new CGBF(O, 0, 0, 0, [1], [1]);
 suite.add(new TestCase("sc.amplitude(O)", sc.amplitude(O), 0.712705, 1e-4));
+suite.add(new TestCase("Sc overlap", Sc(sc, sc), 1.0));
 
 // One electron integrals
 
@@ -220,6 +142,15 @@ function S(a, b) {
   return a.norm * b.norm * Sab;
 }
 suite.add(new TestCase("S(s,s)", S(s, s), 1, 1e-8));
+
+// Contracted Overlap function:
+function Sc(ca, cb) {
+  let olap = 0;
+  for (let i = 0; i < ca.pgbfs.length; i++)
+    for (let j = 0; j < cb.pgbfs.length; j++)
+      olap += ca.coefs[i] * cb.coefs[j] * S(ca.pgbfs[i], cb.pgbfs[j]);
+  return ca.norm * cb.norm * olap;
+}
 
 // Full form of the overlap integral between primative functions:
 function overlap(aexp, aI, aJ, aK, a0, bexp, bI, bJ, bK, b0) {
@@ -291,5 +222,44 @@ function binomial(n, k) {
   return fact(n) / fact(k) / fact(n - k);
 }
 suite.add(new TestCase("binomial", binomial(8, 3), 56));
+
+// Kinetic energy
+function kinetic(alpha1, l1, m1, n1, A, alpha2, l2, m2, n2, B) {
+  let term0 =
+    alpha2 *
+    (2 * (l2 + m2 + n2) + 3) *
+    overlap(alpha1, l1, m1, n1, A, alpha2, l2, m2, n2, B);
+  let term1 =
+    -2 *
+    alpha2 ** 2 *
+    (overlap(alpha1, l1, m1, n1, A, alpha2, l2 + 2, m2, n2, B) +
+      overlap(alpha1, l1, m1, n1, A, alpha2, l2, m2 + 2, n2, B) +
+      overlap(alpha1, l1, m1, n1, A, alpha2, l2, m2, n2 + 2, B));
+  let term2 =
+    -0.5 *
+    (l2 * (l2 - 1) * overlap(alpha1, l1, m1, n1, A, alpha2, l2 - 2, m2, n2, B) +
+      overlap(alpha1, l1, m1, n1, A, alpha2, l2, m2 - 2, n2, B) +
+      overlap(alpha1, l1, m1, n1, A, alpha2, l2, m2, n2-2, B));
+  return term0 + term1 + term2;
+}
+suite.add(
+  new TestCase(
+    "kinetic prim",
+    kinetic(
+      s.exponent,
+      s.I,
+      s.J,
+      s.K,
+      s.origin,
+      s.exponent,
+      s.I,
+      s.J,
+      s.K,
+      s.origin
+    ),
+    2.953052,
+    1e-5
+  )
+);
 
 suite.run(true);
