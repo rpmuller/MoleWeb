@@ -1,55 +1,7 @@
 import { TestCase, TestSuite } from "./test.js";
+import {fact, fact2, distance2} from "./utils.js";
 
-let suite = new TestSuite("PyQuante.jl tests", [
-  new TestCase("1+1", 1 + 1, 2),
-  //new TestCase("1+1",1+1,3), // Test false
-  new TestCase("3.14", Math.PI, 3.14, 1),
-]);
-
-function range(start, end = 0, step = 1) {
-  // TODO make into a generator or iterator
-  let l = [];
-  if (end === 0) {
-    end = start;
-    start = 0;
-  }
-  for (let i = start; i < end; i += step) l.push(i);
-  return l;
-}
-
-function fact2(n) {
-  let prod = 1,
-    v = n;
-  while (v > 0) {
-    prod *= v;
-    v -= 2;
-  }
-  return prod;
-}
-
-function fact(n) {
-  let prod = 1;
-  for (let i = 1; i <= n; i++) prod *= i;
-  return prod;
-}
-
-suite.add(new TestCase("fact(0)", fact(0), 1));
-suite.add(new TestCase("fact2(0)", fact2(0), 1));
-suite.add(new TestCase("fact2(3)", fact2(3), 3));
-
-// replacing the old Point with a 3-tuple:
-function distance2(xyz1, xyz2) {
-  console.assert(xyz1.length === xyz2.length);
-  let dx = xyz1[0] - xyz2[0];
-  let dy = xyz1[1] - xyz2[1];
-  let dz = xyz1[2] - xyz2[2];
-  return dx * dx + dy * dy + dz * dz;
-}
-function distance(xyz1, xyz2) {
-  return Math.sqrt(distance2(xyz1, xyz2));
-}
-
-suite.add(new TestCase("distance", distance([0, 0, 0], [1, 0, 0]), 1));
+let suite = new TestSuite("pyquante tests");
 
 class PGBF {
   constructor(exponent, origin, I = 0, J = 0, K = 0) {
@@ -286,18 +238,11 @@ function array_minus(arr1, arr2) {
   return diff;
 }
 
-function norm2(arr){
-  let total=0;
-  for (let i=0; i<arr.length; i++) total += arr[i]**2;
-  return total
-}
-
 function nuclear_attraction(alpha1, l1, m1, n1, A, alpha2, l2, m2, n2, B, C) {
   let gamma = alpha1 + alpha2;
 
   let P = gaussian_product_center(alpha1, A, alpha2, B);
-  let rab2 = norm2(array_minus(A, B));
-  let rcp2 = norm2(array_minus(C, P));
+  let rab2 = distance2(A, B);
 
   let dPA = array_minus(P, A);
   let dPB = array_minus(P, B);
