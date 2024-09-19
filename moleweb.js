@@ -50,4 +50,4 @@ function e_repulsion(geo) {
   return erep;
 }
 
-export {atnos, parse_xyz, text_part, get_atno, distance, to_kcal_mol};
+export { atnos, parse_xyz, text_part, get_atno, distance, to_kcal_mol };
