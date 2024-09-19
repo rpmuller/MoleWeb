@@ -1,4 +1,4 @@
-import { fact, fact2, distance2 } from "./utils.js";
+import { fact, fact2, binomial, distance2 } from "./utils.js";
 
 // One electron integrals
 
@@ -74,13 +74,6 @@ function gaussian_product_center(aexp, a0, bexp, b0) {
   let a = aexp / (aexp + bexp),
     b = bexp / (aexp + bexp);
   return [a * a0[0] + b * b0[0], a * a0[1] + b * b0[1], a * a0[2] + b * b0[2]];
-}
-
-// binomial coefficient: should this be called `choose`?
-function binomial(n, k) {
-  if (n == k) return 1;
-  console.assert(n > k);
-  return fact(n) / fact(k) / fact(n - k);
 }
 
 // Kinetic energy

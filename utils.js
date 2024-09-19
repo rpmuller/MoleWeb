@@ -29,6 +29,13 @@ function fact(n) {
   return prod;
 }
 
+// binomial coefficient: should this be called `choose`?
+function binomial(n, k) {
+  if (n == k) return 1;
+  console.assert(n > k);
+  return fact(n) / fact(k) / fact(n - k);
+}
+
 // replacing the old Point with a 3-tuple:
 function distance2(xyz1, xyz2) {
   console.assert(xyz1.length === xyz2.length);
@@ -41,4 +48,4 @@ function distance(xyz1, xyz2) {
   return Math.sqrt(distance2(xyz1, xyz2));
 }
 
-export {fact, fact2, distance, distance2};
+export {fact, fact2, binomial, distance, distance2};
