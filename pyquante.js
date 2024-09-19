@@ -319,6 +319,21 @@ function nuclear_attraction(alpha1, l1, m1, n1, A, alpha2, l2, m2, n2, B, C) {
 }
 suite.add(new TestCase("nuclear_attraction",nuclear_attraction(1,0,0,0,[0,0,0],1,0,0,0,[0,0,0],[0,0,0]),-3.141593,1e-6));
 
+function V(a,b,C){
+  return a.norm*b.norm*nuclear_attraction(a.exponent,a.I,a.J,a.K,a.origin,
+    b.exponent,b.I,b.J,b.K,b.origin,C);
+}
+suite.add(new TestCase("nuclear attraction V",V(s,s,[0,0,0]),-1.595769,1e-5));
+
+function Vc(ca,cb,C){
+  let total = 0;
+  for (let i = 0; i < ca.pgbfs.length; i++)
+    for (let j = 0; j < cb.pgbfs.length; j++)
+      total += ca.coefs[i] * cb.coefs[j] * V(ca.pgbfs[i], cb.pgbfs[j],C);
+  return ca.norm * cb.norm * total;
+}
+suite.add(new TestCase("Nuclear attraction Vc",Vc(sc,sc,[0,0,0]),-1.595769,1e-5));
+
 function A_term(i, r, u, l1, l2, PAx, PBx, CPx, gamma) {
   return (
     (Math.pow(-1, i) *
