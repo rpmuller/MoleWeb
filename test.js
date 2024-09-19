@@ -47,7 +47,8 @@ class TestSuite {
       passed += tcase.run(verbose);
     }
     let elapsed = Date.now() - start;
-    console.groupEnd(
+    console.groupEnd();
+    console.log(
       `${ncases - passed} test cases failed out of ${ncases} in ${
         elapsed / 1000
       } sec\n`
