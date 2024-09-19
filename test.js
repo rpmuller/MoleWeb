@@ -30,7 +30,7 @@ class TestCase {
 }
 
 class TestSuite {
-  constructor(name, cases, verbose = false) {
+  constructor(name, cases = [], verbose = false) {
     this.name = name;
     this.cases = cases;
     this.verbose = verbose;
@@ -54,6 +54,10 @@ class TestSuite {
     );
   }
 }
+
+let suite2 = new TestSuite("pyquante/tests testing empty suite");
+suite2.run(true);
+
 let suite = new TestSuite("tests.js tests", [
   new TestCase("1+1", 1 + 1, 2),
   //new TestCase("1+1",1+1,3), // Test false
