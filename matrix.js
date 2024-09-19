@@ -16,11 +16,21 @@ class Matrix {
   *col(j) {
     for (let i = 0; i < this.nrows; i++) yield this.data[i + j * this.nrows];
   }
-  toString(){
-    let rows = []
-    for (let i=0; i<this.nrows; i++)
-        rows.push([...this.row(i)].join(" "));
+  toString() {
+    let rows = [];
+    for (let i = 0; i < this.nrows; i++) rows.push([...this.row(i)].join(" "));
     return rows.join("\n").concat("\n");
+  }
+  scale(a) {
+    // Scale matrix in place:
+    for (let i = 0; i < this.data.length; i++) this.data[i] *= a;
+    return this;
+  }
+  addto(a) {
+    // Increment matrix by another
+    console.assert(this.data.length === a.data.length);
+    for (let i = 0; i < this.data.length; i++) this.data[i] += a.data[i];
+    return this;
   }
 }
 
@@ -36,14 +46,15 @@ function matmult(a, b) {
   for (let j = 0; j < b.ncols; j++)
     for (let i = 0; i < a.nrows; i++)
       for (let k = 0; k < a.ncols; k++)
-        c.data[i + j * c.nrows] += a.data[i + k * a.nrows]*b.data[k + j*b.nrows]
+        c.data[i + j * c.nrows] +=
+          a.data[i + k * a.nrows] * b.data[k + j * b.nrows];
   return c;
 }
 
 let m = new Matrix(2, 2);
 m.set(0, 0, 5);
 let I = identity(2);
-let Im = matmult(I,m);
+let Im = matmult(I, m);
 
 console.log(...m.row(0));
 console.log(...m.col(1));
@@ -51,3 +62,4 @@ console.log(m.get(0, 0));
 console.log(m.toString());
 console.log(identity(5).toString());
 console.log(Im.toString());
+console.log(Im.scale(3).toString());
