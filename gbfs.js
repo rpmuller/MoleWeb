@@ -1,5 +1,5 @@
-import {fact2} from "./utils.js"
-import {Sc} from "./onee_ints.js"
+import { fact2 } from "./utils.js";
+import { Sc } from "./onee_ints.js";
 
 class PGBF {
   constructor(exponent, origin, I = 0, J = 0, K = 0) {
@@ -63,4 +63,4 @@ class CGBF {
   }
 }
 
-export {PGBF, CGBF};
+export { PGBF, CGBF };

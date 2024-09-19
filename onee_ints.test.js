@@ -1,7 +1,7 @@
 import { TestCase, TestSuite } from "./test.js";
 import {
   S,
-//  Sc,
+  //  Sc,
   overlap1d,
   overlap,
   gaussian_product_center,

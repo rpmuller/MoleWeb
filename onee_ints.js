@@ -1,5 +1,4 @@
-import {fact, fact2, distance2} from "./utils.js";
-
+import { fact, fact2, distance2 } from "./utils.js";
 
 // One electron integrals
 
@@ -104,9 +103,23 @@ function kinetic(alpha1, l1, m1, n1, A, alpha2, l2, m2, n2, B) {
   return term0 + term1 + term2;
 }
 
-function T(a,b){
-  return a.norm*b.norm*kinetic(a.exponent,a.I,a.J,a.K,a.origin,
-                              b.exponent,b.I,b.J,b.K,b.origin);
+function T(a, b) {
+  return (
+    a.norm *
+    b.norm *
+    kinetic(
+      a.exponent,
+      a.I,
+      a.J,
+      a.K,
+      a.origin,
+      b.exponent,
+      b.I,
+      b.J,
+      b.K,
+      b.origin
+    )
+  );
 }
 
 function Tc(ca, cb) {
@@ -140,24 +153,40 @@ function nuclear_attraction(alpha1, l1, m1, n1, A, alpha2, l2, m2, n2, B, C) {
   let total = 0;
   for (let I = 0; I < l1 + l2 + 1; I++)
     for (let J = 0; J < m1 + m2 + 1; J++)
-      for (let K = 0; K < n1 + n2 + 1; K++)
-        total += Ax[I] * Ay[J] * Az[K] ;// * Fgamma(I + J + K, rcp2 * gamma);
+      for (let K = 0; K < n1 + n2 + 1; K++) total += Ax[I] * Ay[J] * Az[K]; // * Fgamma(I + J + K, rcp2 * gamma);
 
   let val =
-    ((-2 * Math.PI) / gamma) * Math.exp((-alpha1 * alpha2 * rab2) / gamma) * total;
+    ((-2 * Math.PI) / gamma) *
+    Math.exp((-alpha1 * alpha2 * rab2) / gamma) *
+    total;
   return val;
 }
 
-function V(a,b,C){
-  return a.norm*b.norm*nuclear_attraction(a.exponent,a.I,a.J,a.K,a.origin,
-    b.exponent,b.I,b.J,b.K,b.origin,C);
+function V(a, b, C) {
+  return (
+    a.norm *
+    b.norm *
+    nuclear_attraction(
+      a.exponent,
+      a.I,
+      a.J,
+      a.K,
+      a.origin,
+      b.exponent,
+      b.I,
+      b.J,
+      b.K,
+      b.origin,
+      C
+    )
+  );
 }
 
-function Vc(ca,cb,C){
+function Vc(ca, cb, C) {
   let total = 0;
   for (let i = 0; i < ca.pgbfs.length; i++)
     for (let j = 0; j < cb.pgbfs.length; j++)
-      total += ca.coefs[i] * cb.coefs[j] * V(ca.pgbfs[i], cb.pgbfs[j],C);
+      total += ca.coefs[i] * cb.coefs[j] * V(ca.pgbfs[i], cb.pgbfs[j], C);
   return ca.norm * cb.norm * total;
 }
 
@@ -189,22 +218,19 @@ function A_array(l1, l2, PA, PB, CP, g) {
   return A;
 }
 export {
-    S,
-    Sc,
-    overlap,
-    overlap1d,
-    gaussian_product_center,
-    binomial_prefactor,
-    binomial,
-    kinetic,
-    T,
-    Tc,
-    nuclear_attraction,
-    V,
-    Vc,
-    A_term,
-    A_array,
-  };
-
-  
-  
+  S,
+  Sc,
+  overlap,
+  overlap1d,
+  gaussian_product_center,
+  binomial_prefactor,
+  binomial,
+  kinetic,
+  T,
+  Tc,
+  nuclear_attraction,
+  V,
+  Vc,
+  A_term,
+  A_array,
+};
