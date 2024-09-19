@@ -55,16 +55,6 @@ class TestSuite {
   }
 }
 
-let suite2 = new TestSuite("pyquante/tests testing empty suite");
-suite2.run(true);
-
-let suite = new TestSuite("tests.js tests", [
-  new TestCase("1+1", 1 + 1, 2),
-  //new TestCase("1+1",1+1,3), // Test false
-  new TestCase("3.14", Math.PI, 3.14, 1),
-]);
-
-
 // One-off test case
 const VERBOSE_TESTS = false; // control result printing with global const
 function test(tag, val1, val2, delta) {
@@ -91,9 +81,5 @@ function arrayeq(arr1, arr2, delta) {
     if (!approx(arr1[i], arr2[i], delta)) return false;
   return true;
 }
-
-suite.add(new TestCase("arrayeq",[1,1.2],[1,1.2]));
-
-suite.run(true)
 
 export { TestCase, TestSuite, test };
