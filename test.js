@@ -42,12 +42,12 @@ class TestSuite {
     let ncases = this.cases.length,
       passed = 0;
     let start = Date.now();
-    console.log(`\nTest suite ${this.name}`);
+    console.group(`\nTest suite ${this.name}`);
     for (let tcase of this.cases) {
       passed += tcase.run(verbose);
     }
     let elapsed = Date.now() - start;
-    console.log(
+    console.groupEnd(
       `${ncases - passed} test cases failed out of ${ncases} in ${
         elapsed / 1000
       } sec\n`
