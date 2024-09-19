@@ -243,6 +243,7 @@ function kinetic(alpha1, l1, m1, n1, A, alpha2, l2, m2, n2, B) {
       overlap(alpha1, l1, m1, n1, A, alpha2, l2, m2, n2 - 2, B));
   return term0 + term1 + term2;
 }
+
 suite.add(
   new TestCase(
     "kinetic prim",
@@ -262,6 +263,22 @@ suite.add(
     1e-5
   )
 );
+
+function T(a,b){
+  return a.norm*b.norm*kinetic(a.exponent,a.I,a.J,a.K,a.origin,
+                              b.exponent,b.I,b.J,b.K,b.origin);
+}
+
+suite.add(new TestCase("kinetic T",T(s,s),1.5,1e-6));
+
+function Tc(ca, cb) {
+  let total = 0;
+  for (let i = 0; i < ca.pgbfs.length; i++)
+    for (let j = 0; j < cb.pgbfs.length; j++)
+      total += ca.coefs[i] * cb.coefs[j] * T(ca.pgbfs[i], cb.pgbfs[j]);
+  return ca.norm * cb.norm * total;
+}
+suite.add(new TestCase("kinetic Tc",Tc(sc,sc),1.5,1e-6));
 
 function array_minus(arr1, arr2) {
   let diff = Array(arr1.length);
